@@ -4,12 +4,10 @@ Created on 14. sep. 2017 v2
 @author: LJB
 '''
 from __future__ import division, absolute_import
-from numba import jit, float64, int64, void, int32
+from numba import jit, float64, int64, void
 import numpy as np
 import matplotlib.pyplot as plt
 import timeit
-import scipy.linalg as linalg
-from matplotlib.pyplot import xlabel
 
 
 _DPI = 250
@@ -165,30 +163,44 @@ class Potential(object):
         return omega**2 * rho**2 + 1.0 / rho
 
 
-def test_rho_max_jacobi_interactive_case(omega=0.01):   #2d
+def test_rho_max_jacobi_interactive_case(omega=0.01, rho_max=40, n=512):   #2d
     potential = Potential(omega=omega)
     # now plot the results for the three lowest lying eigenstates
     r, eigenvectors, eigenvalues, iterations = solve_schroedinger_jacobi(
-        n=320, rho_max=5, potential=potential)
-    #errors = []
+        n=n, rho_max=rho_max, potential=potential)
+
+
+    # errors = []
     #for i, trueeigenvalue in enumerate([3, 7, 11]):
         #errors.append(np.abs(eigenvalues[i] - trueeigenvalue))
         # print eigenvalues[i] - trueeigenvalue, eigenvalues[i]
     FirstEigvector = eigenvectors[:, 0]
     SecondEigvector = eigenvectors[:, 1]
     ThirdEigvector = eigenvectors[:, 2]
-    plt.plot(r, FirstEigvector**2, 'b-', r, SecondEigvector **
-             2, 'g-', r, ThirdEigvector**2, 'r-')
+    plt.plot(r, FirstEigvector**2, 'b-',
+             r, SecondEigvector ** 2, 'g-',
+             r, ThirdEigvector**2, 'r-')
+
+    m0 = max(FirstEigvector**2)
+
+    we = np.sqrt(3)*omega
+    print((we/np.pi)**(1/4)/m0)
+    r0 = (2*omega**2)**(-1/3)
+    g = lambda r: m0*np.exp(-0.5*we*(r-r0)**2)
+
+
+    plt.plot(r, g(r), ':')
     #plt.axis([0, 4.6, 0.0, 0.025])
     plt.xlabel(r'$\rho$')
     plt.ylabel(r'$u(\rho)$')
     max_r = np.max(r)
     print omega
     #omega = np.max(errors)
-    plt.suptitle(r'Normalized energy for the three lowest states interactive case.')  #as a function of various omega_r 
+    plt.suptitle(r'Normalized energy for the three lowest states interactive case.')  #as a function of various omega_r
     plt.title(r'$\rho$ = {0:2.1f}, n={1}, omega={2:2.1g}'.format(
         max_r, len(r), omega))
     plt.savefig('eigenvector_rho{0}n{1}omega{2}.png'.format(int(max_r * 10), len(r),int(omega*100)))
+
 
 
 def solve_schroedinger_jacobi(n=160, rho_max=5, potential=None):
@@ -219,31 +231,41 @@ def solve_schroedinger_jacobi(n=160, rho_max=5, potential=None):
     return r, eigenvectors, eigenvalues, iterations
 
 
+
 def test_iterations():
         # now plot the results for the three lowest lying eigenstates
     num_iterations = []
 
-    dims = [8, 16, 32, 64, 128, 256]
+    dims = [8, 16, 32, 64, 128, 256, 320, 512]
     if False:
         for n in dims:
-
             r, eigenvectors, eigenvalues, iterations = solve_schroedinger_jacobi(
                 n=n, rho_max=5)
             num_iterations.append(iterations)
     else:
-        num_iterations = [80, 374, 1623, 6741, 27070, 109974]
+        num_iterations = [80, 374, 1623, 6741, 27070, 109974, 171973, 442946]
 
     step = np.linspace(0, 1.1 * dims[-1], 100)
-    coeff = np.polyfit(dims, num_iterations, deg=2)
+    coeff = np.polyfit(dims, np.array(num_iterations)/np.array(dims), deg=1)
+    # coeff = np.round(coeff)
+    coeff = np.hstack((coeff, 0))
     print coeff
-    plt.plot(dims, num_iterations, '.', label='Exact number of iterations')
-    plt.plot(step, np.polyval(coeff, step), '-',
-             label='{:0.2f}x**2+{:0.2f}x+{:0.2f}'.format(coeff[0], coeff[1], coeff[2]))
-    plt.xlabel('n')
-    plt.ylabel('Iterations')
-    plt.title('Number of similarity transformations')
-    plt.legend(loc=2)
-    plt.savefig('num_iterations{0}n{1}.png'.format(dims[-1], len(dims)))
+
+    for plot_type, plot in zip(['linear', 'logy', 'loglog'], [plt.plot, plt.semilogy, plt.loglog]):
+        plt.figure()
+        plot(dims, num_iterations, '.', label='Exact number of iterations')
+        plot(step, np.polyval(coeff, step), '-',
+                 label='{:0.2f}n**2{:0.2f}n'.format(coeff[0], coeff[1]))
+        # plot(step, 1.7*step**2, '-', label='1.7n^2')
+        plot(step, 3*step**2-5*step, '-', label='3n^2-5*n')
+        # plot(step, 1.5*step**2-5*step+10, '-', label='1.5n^2-5*n+10')
+
+        plt.xlabel('n')
+        plt.ylabel('Iterations')
+        plt.title('Number of similarity transformations')
+        plt.legend(loc=2)
+        plt.grid(True)
+        plt.savefig('num_iterations{0}n{1}{2}.png'.format(dims[-1], len(dims), plot_type))
     plt.show()
 
 
@@ -375,9 +397,12 @@ if __name__ == '__main__':
     #     plt.show()
     # solve_schroedinger()
     # test_rho_max_jacobi()
-    # test_iterations()
-    
-    for i, omega in enumerate([0.01, 0.5, 1, 5]):
-        plt.figure(i)
-        test_rho_max_jacobi_interactive_case(omega)
+    #test_iterations()
+
+
+    for rho_max, omega in zip([60, 10, 6, 3], [0.01, 0.5, 1, 5]):
+        plt.figure()
+        print(omega)
+        test_rho_max_jacobi_interactive_case(omega, rho_max=rho_max, n=128)
+#test_rho_max_jacobi_interactive_case(omega=0.01, rho_max=60, n=128)
     plt.show()
