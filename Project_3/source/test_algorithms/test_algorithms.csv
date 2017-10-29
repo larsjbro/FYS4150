@@ -1,0 +1,16 @@
+,beta,elapsed_time,k,method
+0,2,0.00690210905808,4,ForwardEuler
+1,2,0.0289561218737,5,ForwardEuler
+2,2,0.0581090338306,6,ForwardEuler
+3,2,0.0790046898528,7,ForwardEuler
+4,2,0.1602696677,8,ForwardEuler
+5,2,0.00841487453233,4,CentralEuler
+6,2,0.0205748229006,5,CentralEuler
+7,2,0.0311525230401,6,CentralEuler
+8,2,0.0777479380177,7,CentralEuler
+9,2,0.16273140905,8,CentralEuler
+10,2,0.015816420034,4,VelocityVerlet
+11,2,0.0344914258747,5,VelocityVerlet
+12,2,0.0737892863188,6,VelocityVerlet
+13,2,0.138081352647,7,VelocityVerlet
+14,2,0.319016310727,8,VelocityVerlet
