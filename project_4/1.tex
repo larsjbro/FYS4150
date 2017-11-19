@@ -24,7 +24,7 @@ The one- and two- dimensional systems have analytical solutions for various expe
 
 
 \begin{equation}
-E = -J\Sigma_{<kl>}^Ns_ks_l
+E = -J\sum_{<kl>}^Ns_ks_l
 \end{equation}
 
 , where J is the coupling constant expressing the strength of the interaction between neigboring spins. $<kl>$ indicates that we sum over the nearest neigbors only, e.g. that only neighboring spins interact with each other. N is the total number of spins. We will assume ferromagnetic ordering, 
@@ -48,7 +48,7 @@ The derivation is based on the lecture note on statistics for the ising model \c
 The Ising model is a typical canonical ensemble. The system allows for heat interaction, whilst holding fixed the volume, temperature and number of particles. The partition function is given by:
 
 \begin{equation}
-Z = \Sigma_ie^{-\beta E_i} 
+Z = \sum_ie^{-\beta E_i} 
 \end{equation}
 
 , where $\beta = 1/kT$, where k = Boltzmann's constant and T = temperature, $E_i$ is the energy for each microstate.\\
@@ -63,18 +63,18 @@ P_i(\beta) = \frac{e^{-\beta E_i}}{Z}
 
 The mean energy is given as:
 \begin{equation}
-<E> = \Sigma_i^ME_iP_i(\beta) = \frac{1}{Z}\Sigma_i^ME_ie^{-\beta E_i}
+<E> = \sum_i^ME_iP_i(\beta) = \frac{1}{Z}\sum_i^ME_ie^{-\beta E_i}
 \end{equation}\\
 
 
 And the corresponding specific heat $C_v=\frac{1}{kT^2}$, k and T again being Boltzmann's constant and temperature, is represented by the variance:
 
 \begin{equation}
-\sigma^2 = <E^2> - <E>^2 = \frac{1}{Z}\Sigma_i^ME_i^2e^{-\beta E_i}-(\frac{1}{Z}\Sigma_i^ME_ie^{-\beta E_i})^2
+\sigma^2 = <E^2> - <E>^2 = \frac{1}{Z}\sum_i^ME_i^2e^{-\beta E_i}-(\frac{1}{Z}\sum_i^ME_ie^{-\beta E_i})^2
 \end{equation}\\
 
 \begin{equation}
-<|M|> = \Sigma_i^M|M_i|P_i(\beta)
+<|M|> = \sum_i^M|M_i|P_i(\beta)
 \end{equation}
 
 
